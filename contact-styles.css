@@ -1,0 +1,237 @@
+/* Add these styles to panel.css */
+
+/* Company Row Container */
+.company-row {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  background: #fff;
+  transition: box-shadow 0.2s;
+}
+
+.company-row:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.company-row.expanded {
+  border-color: #0078d4;
+}
+
+/* Main Company Row */
+.company-main-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px;
+  gap: 12px;
+}
+
+.company-main-row:hover {
+  background: #f8f8f8;
+}
+
+/* Expand Icon */
+.expand-icon {
+  flex-shrink: 0;
+  width: 20px;
+  font-size: 12px;
+  color: #666;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2px;
+}
+
+/* Checkbox */
+.contact-checkbox {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.main-contact-checkbox {
+  accent-color: #0078d4;
+}
+
+/* Company Info Grid */
+.company-info {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.company-field {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field-label {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.field-value {
+  color: #555;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.field-value:hover {
+  overflow: visible;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Company name field */
+.company-field.company-name {
+  grid-column: 1 / -1;
+}
+
+.company-field.company-name .field-value {
+  font-weight: 600;
+  color: #0078d4;
+  font-size: 14px;
+}
+
+.contact-count {
+  font-size: 12px;
+  color: #666;
+  font-weight: normal;
+  margin-left: 8px;
+}
+
+/* Divisions list */
+.divisions-list {
+  font-size: 12px;
+  color: #666;
+}
+
+.company-field.company-divisions {
+  grid-column: 1 / -1;
+}
+
+/* Additional Contacts Container */
+.additional-contacts-container {
+  border-top: 1px solid #e0e0e0;
+  background: #f9f9f9;
+  padding: 12px;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+}
+
+/* Select Buttons */
+.select-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.select-buttons button {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.select-buttons button:hover {
+  background: #0078d4;
+  color: white;
+  border-color: #0078d4;
+}
+
+.select-all-company {
+  color: #0078d4;
+}
+
+.clear-all-company {
+  color: #d13438;
+}
+
+/* Additional Contact Rows */
+.additional-contact-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 10px;
+  margin-bottom: 6px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  gap: 12px;
+}
+
+.additional-contact-row:hover {
+  border-color: #0078d4;
+  background: #f0f7ff;
+}
+
+.additional-contact-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Additional Contact Info */
+.additional-contact-info {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.additional-contact-info .contact-field {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* No Results Message */
+.no-results {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .company-info {
+    grid-template-columns: 1fr;
+  }
+  
+  .additional-contact-info {
+    grid-template-columns: 1fr;
+  }
+  
+  .company-field.company-name,
+  .company-field.company-divisions {
+    grid-column: 1;
+  }
+}

@@ -1,0 +1,2 @@
+
+try { importScripts('excel-summary-bg.js'); } catch(e) { console.warn('excel-summary not loaded', e); }

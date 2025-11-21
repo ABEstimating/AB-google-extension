@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+
+
+
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8"/>
+
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
+<title>AutoBuilders Extension</title>
+
+<link href="panel.css" rel="stylesheet"/>
+
+</head>
+
+<body>
+
+<div id="appLoadingOverlay" class="app-loading-overlay app-hidden" aria-hidden="true">
+
+  <div class="app-loading-backdrop"></div>
+
+  <div class="app-loading-panel" role="status" aria-live="polite">
+
+    <div class="app-loading-spinner" id="appLoadingSpinner" aria-hidden="true"></div>
+
+    <h2 id="appLoadingTitle">Loading company data...</h2>
+
+    <p id="appLoadingSubtext" class="app-loading-message"></p>
+
+    <button type="button" class="btn btn-primary app-loading-action app-hidden" id="appLoadingAction">Retry</button>
+
+  </div>
+
+</div>
+
+<header class="app-header">
+
+  <div class="header-content">
+
+    <img src="ab-logo-white-24h.png" alt="AutoBuilders" class="header-logo">
+
+  </div>
+
+  <div class="header-actions">
+    <button class="header-text-btn" id="detachPanelBtn" type="button" title="Detach panel">Detach</button>
+    <button class="close-btn" id="closePanel" type="button" aria-label="Close"></button>
+  </div>
+
+</header>
+
+<nav class="tabs">
+
+  <!-- Pinned tabs -->
+
+  <button class="tab active" data-tab="add-bidder" title="Add Bidder">
+
+    <span class="tab-ico" aria-hidden="true">
+
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h8v-2h8v-2c0-2.66-5.33-4-8-4zM4 13h3v-2h2v-3H7V5H4v3H2v3h2v2z"/></svg>
+
+    </span>
+
+    <span class="tab-label">Bidder</span>
+
+  </button>
+
+  <button class="tab" data-tab="add-bid" title="Add Bid">
+
+    <span class="tab-ico" aria-hidden="true">
+
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16l4-4h10c1.1 0 2-.9 2-2V6l-6-4z"/></svg>
+
+    </span>
+
+    <span class="tab-label">Bid</span>
+
+  </button>
+
+  <button class="tab" data-tab="campaign" title="Campaign">
+
+    <span class="tab-ico" aria-hidden="true">
+
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 3v18l8-5h2V8h-2l-8-5zM2 9h6v6H2V9z"/></svg>
+
+    </span>
+
+    <span class="tab-label">Campaign</span>
+
+  </button>
+
+
+
+  <!-- Overflow trigger -->
+
+  <div class="more-trigger" id="moreTabBtn" title="More" aria-haspopup="true" aria-expanded="false">&#8942;</div>
+
+  <div id="moreMenu" class="more-menu" hidden>
+
+    <button class="more-item" data-target-tab="invite">Invite</button>
+
+    <button class="more-item" data-target-tab="projects">Projects</button>
+
+    <button class="more-item" data-target-tab="contacts">Contacts</button>
+
+    <button class="more-item" data-target-tab="debug">Debug</button>
+
+    <button class="more-item" data-target-tab="audit">Audit</button>
+
+  </div>
+
+
+
+  <!-- Hidden originals to preserve logic -->
+
+  <button class="tab hidden" data-tab="invite">Invite</button>
+
+  <button class="tab hidden" data-tab="projects">Projects</button>
+
+  <button class="tab hidden" data-tab="contacts">Contacts</button>
+
+  <button class="tab hidden" data-tab="debug">Debug</button>
+
+  <button class="tab hidden" data-tab="audit">Audit</button>
+
+</nav>
+
+<div class="status-bar" id="statusBar">
+
+<span id="statusText">Ready</span>
+
+<div class="connection-indicator">
+
+<span class="status-dot" id="statusDot"></span>
+
+<span id="connectionText">Disconnected</span>
+
+</div>
+
+<button class="btn btn-primary" id="connectBtn" style="padding:6px 12px;">Connect</button>
+
+</div>
+
+<main>
+
+<!-- Add Bidder Tab -->
+
+<section class="tab-content active" id="add-bidder-tab">
+
+<div class="bid-form">
+
+<h3>Add Bidder to Project</h3>
+
+<!-- Project Selection -->
+
+<div class="form-section">
+
+<h4>Project Information</h4>
+
+<div class="form-group">
+
+<label for="bidderProjectInput">Project Name</label>
+
+<input class="form-input" id="bidderProjectInput" placeholder="Project name will auto-detect from email subject" type="text"/>
+
+<button class="btn btn-primary" id="loadProjectBtn" style="margin-top: 8px;">
+
+              Load Project
+
+            </button>
+
+</div>
+
+</div>
+
+<!-- Contact Information -->
+
+<div class="form-section">
+
+<h4>Contact Information</h4>
+
+<p class="form-hint">Auto-filled from email. Edit if needed.</p>
+
+<div class="form-group">
+
+<label for="bidderCompany">Company Name</label>
+
+<input class="form-input" id="bidderCompany" placeholder="Company name" type="text"/>
+
+</div>
+
+<div class="form-group">
+
+<label for="bidderName">Contact Name *</label>
+
+<input class="form-input" id="bidderName" placeholder="Contact name" type="text"/>
+
+</div>
+
+<div class="form-group">
+
+<label for="bidderPhone">Phone Number</label>
+
+<input class="form-input" id="bidderPhone" placeholder="(555) 123-4567" type="tel"/>
+
+</div>
+
+<div class="form-group">
+
+<label for="bidderEmail">Email Address *</label>
+
+<input class="form-input" id="bidderEmail" placeholder="email@example.com" required="" type="email"/>
+
+</div>
+
+</div>
+
+<!-- Division Selection -->
+
+<div class="form-section">
+
+<div class="divisions-container" id="divisionsContainer">
+
+<p class="empty-state">Load a project to see available divisions</p>
+
+</div>
+
+</div>
+
+<!-- Submit Button -->
+
+<div class="form-actions">
+
+<button class="btn btn-primary" id="submitBidderBtn">
+
+            Add Bidder to Project
+
+          </button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- Add Bid Tab -->
+
+<section class="tab-content" id="add-bid-tab">
+
+<form class="bid-form" id="bidForm">
+
+<div class="form-group">
+
+<label for="bidProject">Project Name*</label>
+
+<input class="form-input" id="bidProject" list="bidProjectList" placeholder="Type to search projects..." required="" type="text"/>
+
+<datalist id="bidProjectList"></datalist>
+
+</div>
+
+<div class="form-group">
+
+<label for="bidCompany">Company Name*</label>
+
+<input class="form-input" id="bidCompany" placeholder="Enter company name" required="" type="text"/>
+
+</div>
+
+<div class="form-group">
+
+<label for="bidContact">Contact Name</label>
+
+<input class="form-input" id="bidContact" placeholder="Enter contact name" type="text"/>
+
+</div>
+
+<div class="form-group">
+
+<label for="bidEmail">Email*</label>
+
+<input class="form-input" id="bidEmail" placeholder="contact@company.com" required="" type="email"/>
+
+</div>
+
+<div class="form-group">
+
+<label for="bidPhone">Phone</label>
+
+<input class="form-input" id="bidPhone" placeholder="(555) 123-4567" type="tel"/>
+
+</div>
+
+<div class="form-group">
+
+<label>Divisions*</label>
+
+<div class="division-checklist" id="bidDivisionChecklist">
+
+<p class="form-hint">Load a project to see available divisions.</p>
+
+</div>
+
+</div>
+
+<div class="form-group">
+
+<label for="bidNotes">Notes</label>
+
+<textarea class="form-input" id="bidNotes" placeholder="Add any additional notes..." rows="3"></textarea>
+
+</div>
+
+<div class="form-group">
+
+<label for="bidNotes">Notes</label>
+
+<textarea class="form-input" id="bidNotes" placeholder="Add any additional notes..." rows="3"></textarea>
+
+</div>
+
+<div class="form-actions">
+
+<button class="btn btn-primary" type="submit">
+
+<svg fill="white" height="16" viewbox="0 0 24 24" width="16">
+
+<path d="M17 3H5c-1.11 0-1.99.9-1.99 2L3 21l4-4h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H5v-2h4V7h2v4h4v2z"></path>
+
+</svg>
+
+            Submit Bid
+
+          </button>
+
+<button class="btn btn-secondary" type="reset">Clear Form</button>
+
+</div>
+
+</form>
+
+</section>
+
+<!-- Invite Tab -->
+
+<section class="tab-content" id="invite-tab">
+
+<div class="invite-search">
+
+<h3>Search Filters</h3>
+
+<div class="filter-grid">
+
+<div class="filter-item">
+
+<label>Company Name</label>
+
+<input class="form-input" id="companyFilter" list="companyList" placeholder="Type to search..." type="text"/>
+
+<datalist id="companyList"></datalist>
+
+</div>
+
+<div class="filter-item">
+
+<label>Contact Name</label>
+
+<input class="form-input" id="contactNameFilter" list="contactList" placeholder="Type to search..." type="text"/>
+
+<datalist id="contactList"></datalist>
+
+</div>
+
+<div class="filter-item">
+
+<label>Email</label>
+
+<input class="form-input" id="emailFilter" list="emailList" placeholder="Type to search..." type="text"/>
+
+<datalist id="emailList"></datalist>
+
+</div>
+
+<div class="filter-item">
+
+<label>City</label>
+
+<input class="form-input" id="cityFilter" list="cityList" placeholder="Type to search..." type="text"/>
+
+<datalist id="cityList"></datalist>
+
+</div>
+
+<div class="filter-item">
+
+<label>State</label>
+
+<select class="styled-dropdown" id="stateFilter">
+
+<option value="">All States</option>
+
+</select>
+
+</div>
+
+<div class="filter-item">
+
+<label>Project</label>
+
+<input class="form-input" id="projectFilter" list="projectList" placeholder="Type to search..." type="text"/>
+
+<datalist id="projectList"></datalist>
+
+</div>
+
+<div class="filter-item">
+
+<label>Division/Trade</label>
+
+<select class="styled-dropdown" id="divisionFilter">
+
+<option value="">All Divisions</option>
+
+</select>
+
+</div>
+
+<div class="filter-item">
+
+<label>Zip Code</label>
+
+<input class="form-input" id="zipFilter" placeholder="Zip code" type="text"/>
+
+</div>
+
+<div class="filter-item">
+
+<label>Radius (miles)</label>
+
+<select class="styled-dropdown" id="radiusFilter">
+
+<option value="">No radius filter</option>
+
+<option value="10">10 miles</option>
+
+<option value="25">25 miles</option>
+
+<option value="50">50 miles</option>
+
+<option value="100">100 miles</option>
+
+</select>
+
+</div>
+
+</div>
+
+<div class="filter-actions">
+
+<button class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+
+<button class="btn btn-secondary" id="clearFiltersBtn">Clear Filters</button>
+
+</div>
+
+</div>
+
+<div class="invite-results">
+
+<div class="results-header">
+
+<span id="inviteResultCount">0 companies found</span>
+
+<label class="select-all-wrapper">
+
+<input id="selectAllInvites" type="checkbox"/>
+
+<span>Select All</span>
+
+</label>
+
+</div>
+
+<div class="results-container" id="inviteResultsContainer">
+
+<!-- Company results with expandable contacts will go here -->
+
+</div>
+
+</div>
+
+<div class="invite-actions">
+
+<button class="btn btn-primary" disabled="" id="sendEmailBtn">
+
+<svg fill="white" height="16" viewbox="0 0 24 24" width="16">
+
+<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path>
+
+</svg>
+
+          Send Email
+
+        </button>
+
+<button class="btn btn-secondary" disabled="" id="copyContactsBtn">
+
+          Copy Contacts
+
+        </button>
+
+<button class="btn btn-secondary" disabled="" id="exportInvitesBtn">
+
+          Export to Excel
+
+        </button>
+
+</div>
+
+</section>
+
+<!-- Projects Tab -->
+
+<section class="tab-content" id="projects-tab">
+
+<div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+
+<h3 style="margin: 0 0 15px 0; color: #333;">Project Workbook Viewer</h3>
+
+<div style="margin-bottom: 15px; position: relative;">
+
+<label style="display: block; margin-bottom: 5px; color: #666; font-size: 13px;">Select Project</label>
+
+<input id="projectSearchInput" placeholder="Type to search projects..." style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;" type="text">
+
+<div id="projectDropdown" style="display: none; position: absolute; background: white; border: 1px solid #ced4da; border-radius: 4px; max-height: 200px; overflow-y: auto; width: calc(100% - 30px); z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-top: 2px;"></div>
+
+</input></div>
+
+<div id="selectedProjectInfo" style="display: none; padding: 10px; background: #e7f3ff; border-left: 4px solid #2196F3; border-radius: 4px; margin-bottom: 15px;">
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+
+<div>
+
+<strong style="color: #1976D2;">Selected: <span id="selectedProjectName"></span></strong>
+
+<div style="font-size: 12px; color: #666; margin-top: 3px;">
+
+<span id="projectContactCount">0 contacts</span> | 
+
+                <span id="projectDivisionCount">0 divisions</span>
+
+</div>
+
+</div>
+
+<button class="btn btn-secondary" id="refreshProjectBtn" style="font-size: 12px; padding: 5px 12px;">
+
+              Refresh
+
+            </button>
+
+</div>
+
+</div>
+
+<div id="projectLoadingMsg" style="display: none; text-align: center; padding: 20px; color: #666;">
+
+<div style="margin-bottom: 10px;">Loading project workbook...</div>
+
+<div style="font-size: 12px;">This may take a moment</div>
+
+</div>
+
+</div>
+
+<!-- Contacts Table -->
+
+<div id="projectContactsContainer" style="display: none;">
+
+<div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+
+<h4 style="margin: 0; color: #333;">Project Contacts</h4>
+
+<div style="display: flex; gap: 10px;">
+
+<button class="btn btn-secondary" id="selectAllProjectContacts" style="font-size: 12px; padding: 5px 12px;">
+
+                Select All
+
+              </button>
+
+<button class="btn btn-primary" id="exportProjectContacts" style="font-size: 12px; padding: 5px 12px;">
+
+                Export Selected
+
+              </button>
+
+</div>
+
+</div>
+
+<div id="projectContactsList"></div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- Contacts Tab -->
+
+<section class="tab-content" id="contacts-tab">
+
+<div class="contacts-content">
+
+<h3>All Contacts</h3>
+
+<div class="contacts-summary">
+
+<span id="contactsSummary">Loading...</span>
+
+</div>
+
+<div class="results-container" id="contactsListContainer">
+
+<!-- All contacts list will go here -->
+
+</div>
+
+</div>
+
+</section>
+
+<!-- Debug Tab -->
+
+<section class="tab-content" id="debug-tab">
+
+<div class="debug-content">
+
+<h3>State-by-State Scanner</h3>
+
+<div class="scanner-section" style="background: white; padding: 5px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+
+<p style="margin-bottom: 12px; color: #6c757d;"></p>
+
+<div style="display: flex; gap: 12px; margin-bottom: 12px;">
+
+<select class="styled-dropdown" id="stateSelector" style="flex: 1; padding: 8px; border: 1px solid #ced4da; border-radius: 4px;">
+
+<option value="">Select a state...</option>
+
+</select>
+
+<button class="btn btn-primary" id="scanStateBtn">Scan Selected State</button>
+
+</div>
+
+<button class="btn btn-secondary" id="scanAllStatesBtn" style="width: 100%; margin-bottom: 12px;">Scan All States Sequentially</button>
+
+<div id="scanProgressContainer" style="display: none; margin-top: 15px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+
+<div style="margin-bottom: 8px;">
+
+<strong>Scanning Progress</strong>
+
+</div>
+
+<div style="margin-bottom: 10px;">
+
+<div id="progressStatus" style="font-size: 12px; color: #666; margin-bottom: 5px;">
+
+                Initializing...
+
+              </div>
+
+<div style="background: #ddd; border-radius: 10px; height: 20px; overflow: hidden;">
+
+<div id="progressBar" style="background: linear-gradient(90deg, #4CAF50, #45a049); height: 100%; width: 0%; transition: width 0.3s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: bold;">
+
+                  0%
+
+                </div>
+
+</div>
+
+</div>
+
+<div style="display: flex; justify-content: space-between; font-size: 11px; color: #666;">
+
+<span id="fileCount">Files: 0/0</span>
+
+<span id="timeRemaining">Time remaining: calculating...</span>
+
+</div>
+
+</div>
+
+<div id="stateScanStatus" style="padding: 8px; background: #f8f9fa; border-radius: 4px; min-height: 24px; color: #495057; font-size: 14px;">
+
+            Select a state to begin scanning
+
+          </div>
+
+</div>
+
+<h3>SharePoint Data Status</h3>
+
+<div class="debug-stats">
+
+<div class="stat-card">
+
+<h4>Connection Status</h4>
+
+<div id="debugConnection">Not Connected</div>
+
+</div>
+
+<div class="stat-card">
+
+<h4>Last Scan</h4>
+
+<div id="debugLastScan">Never</div>
+
+</div>
+
+<div class="stat-card">
+
+<h4>Total Projects</h4>
+
+<div id="debugProjects">0</div>
+
+</div>
+
+<div class="stat-card">
+
+<h4>Total Contacts</h4>
+
+<div id="debugContacts">0</div>
+
+</div>
+
+<div class="stat-card">
+
+<h4>Unique Companies</h4>
+
+<div id="debugCompanies">0</div>
+
+</div>
+
+<div class="stat-card">
+
+<h4>Unique Divisions</h4>
+
+<div id="debugDivisions">0</div>
+
+</div>
+
+</div>
+
+<div class="debug-details">
+
+<h4>Contacts by State</h4>
+
+<div id="debugStateBreakdown"></div>
+
+<h4>Contacts by Division</h4>
+
+<div id="debugDivisionBreakdown"></div>
+
+      </div>
+
+<div class="debug-actions">
+
+<button class="btn btn-primary" id="refreshStatsBtn">Refresh Statistics</button>
+
+<button class="btn btn-secondary" id="clearCacheBtn">Clear Cache</button>
+
+<button class="btn btn-secondary" id="manualBackupBtn">Download Backup</button>
+
+<input accept=".json" id="restoreFileInput" style="display:none;" type="file"/>
+
+<button class="btn btn-secondary" id="uploadRemoteCacheBtn">Upload Cache to SharePoint</button>
+
+<button class="btn btn-secondary" id="downloadRemoteCacheBtn">Download Cache from SharePoint</button>
+
+<button class="btn btn-secondary" id="syncRemoteCacheBtn">Sync Cache with SharePoint</button>
+
+<button class="btn btn-secondary" id="restoreBackupBtn">Restore from Backup</button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- Audit Tab (hidden/internal) -->
+<section class="tab-content" id="audit-tab">
+  <!-- NEW: Tracked Entries UI Container -->
+  <div id="trackedEntriesContainer" style="padding: 16px;"></div>
+</section>
+<section class="tab-content" id="campaign-tab">
+
+<!-- AB Campaigns: Mode + Existing/New + KPI + Recipients + Review & Send -->
+<div class="cmp-wrap">
+  <section class="cmp-section" id="cmpSectionMode">
+    <div class="cmp-section-header">
+      <h3>Mode</h3>
+    </div>
+    <div class="cmp-section-body">
+      <div class="form-group">
+        <label>Mode</label>
+        <div class="cmp-radio-group">
+          <label class="cmp-radio-option"><input type="radio" name="cmpMode" value="existing" checked> Existing</label>
+          <label class="cmp-radio-option"><input type="radio" name="cmpMode" value="new"> New</label>
+        </div>
+      </div>
+      <div class="form-group cmp-mode-existing" id="cmpSelectRow">
+        <label for="cmpSelect">Select Campaign</label>
+        <select class="styled-dropdown" id="cmpSelect"></select>
+        <div class="form-hint">Sorted by most recent activity.</div>
+        <div class="cmp-inline-actions">
+          <button class="btn btn-secondary" id="cmpRefreshBtn">Refresh</button>
+          <button class="btn btn-secondary" id="cmpDeleteBtn">Delete</button>
+        </div>
+      </div>
+      <div class="form-group cmp-mode-new" id="cmpNewNameGroup">
+        <label for="cmpName">Campaign Name</label>
+        <input id="cmpName" class="form-input" placeholder="e.g., Tesla Langhorne — Round 1">
+      </div>
+    </div>
+  </section>
+
+  <section class="cmp-section" id="cmpSectionAddContacts">
+    <div class="cmp-section-header">
+      <h3>Add Contacts</h3>
+    </div>
+    <div class="cmp-section-body">
+      <div class="cmp-mode-new">
+        <div class="form-group">
+          <label for="cmpNewRecipients">Initial recipients</label>
+          <textarea id="cmpNewRecipients" class="form-input" rows="4" placeholder="email1@example.com, email2@example.com"></textarea>
+          <div class="form-hint">Separate addresses with commas or new lines.</div>
+        </div>
+      </div>
+      <div class="cmp-mode-existing">
+        <div class="form-group">
+          <label>Search contacts</label>
+          <form id="cmpContactSearchForm" class="cmp-contact-search">
+            <div class="cmp-contact-search-grid">
+              <div class="cmp-search-field">
+                <label for="cmpSearchZip">Zip code</label>
+                <input id="cmpSearchZip" class="form-input" placeholder="33487" maxlength="10">
+              </div>
+              <div class="cmp-search-field">
+                <label for="cmpSearchRadius">Radius (miles)</label>
+                <input id="cmpSearchRadius" class="form-input" type="number" min="1" step="1" placeholder="25">
+              </div>
+              <div class="cmp-search-field">
+                <label for="cmpSearchCityInput">City</label>
+                <div class="cmp-multiselect" data-field="city">
+                  <div class="cmp-chip-list" id="cmpSearchCityChips"></div>
+                  <input id="cmpSearchCityInput" class="cmp-multiselect-input" placeholder="Start typing a city" autocomplete="off">
+                  <div class="cmp-multiselect-dropdown" id="cmpSearchCityDropdown"></div>
+                  <input type="hidden" id="cmpSearchCity">
+                </div>
+              </div>
+              <div class="cmp-search-field">
+                <label for="cmpSearchStateInput">State</label>
+                <div class="cmp-multiselect" data-field="state">
+                  <div class="cmp-chip-list" id="cmpSearchStateChips"></div>
+                  <input id="cmpSearchStateInput" class="cmp-multiselect-input" placeholder="Start typing a state" autocomplete="off" maxlength="30">
+                  <div class="cmp-multiselect-dropdown" id="cmpSearchStateDropdown"></div>
+                  <input type="hidden" id="cmpSearchState">
+                </div>
+              </div>
+              <div class="cmp-search-field">
+                <label for="cmpSearchProjectInput">Project</label>
+                <div class="cmp-multiselect" data-field="project">
+                  <div class="cmp-chip-list" id="cmpSearchProjectChips"></div>
+                  <input id="cmpSearchProjectInput" class="cmp-multiselect-input" placeholder="Start typing a project" autocomplete="off">
+                  <div class="cmp-multiselect-dropdown" id="cmpSearchProjectDropdown"></div>
+                  <input type="hidden" id="cmpSearchProject">
+                </div>
+              </div>
+              <div class="cmp-search-field">
+                <label for="cmpSearchDivisionInput">Division</label>
+                <div class="cmp-multiselect" data-field="division">
+                  <div class="cmp-chip-list" id="cmpSearchDivisionChips"></div>
+                  <input id="cmpSearchDivisionInput" class="cmp-multiselect-input" placeholder="Start typing a division" autocomplete="off">
+                  <div class="cmp-multiselect-dropdown" id="cmpSearchDivisionDropdown"></div>
+                  <input type="hidden" id="cmpSearchDivision">
+                </div>
+              </div>
+
+            </div>
+            <div class="cmp-contact-search-actions">
+              <button id="cmpContactSearchBtn" class="btn btn-secondary" type="submit">Search</button>
+              <button id="cmpContactResetBtn" class="link-btn" type="button">Clear</button>
+            </div>
+          </form>
+        </div>
+        <div class="form-group">
+          <label>Search results</label>
+          <div class="cmp-contact-results-header">
+            <span id="cmpContactResultsCount">Run a search to see contacts.</span>
+            <div class="cmp-contact-results-actions">
+              <button id="cmpContactSelectAll" class="link-btn" type="button" disabled>Select all</button>
+              <button id="cmpContactClearSelection" class="link-btn" type="button" disabled>Clear selection</button>
+            </div>
+          </div>
+          <div id="cmpContactResults" class="cmp-contact-results empty">
+            <p class="cmp-contact-placeholder">No contacts loaded.</p>
+          </div>
+          <button id="cmpAddSelectedContacts" class="btn btn-primary cmp-contact-add-btn" type="button" disabled>Add selected to campaign</button>
+        </div>
+        <div class="form-group">
+          <label>Add recipients</label>
+          <input id="cmpAddEmails" class="form-input" placeholder="email1@example.com, email2@example.com">
+          <button class="btn btn-secondary" id="cmpAddBtn" style="margin-top:8px;">Add</button>
+        </div>
+        <div class="form-group">
+          <label>Recipients</label>
+          <div id="cmpRecipients" class="cmp-recipient-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cmp-section" id="cmpSectionEmail">
+    <div class="cmp-section-header">
+      <h3>Email Campaign</h3>
+    </div>
+    <div class="cmp-section-body">
+      <div class="cmp-mode-new">
+        <div class="form-group">
+          <label for="cmpSubjectTpl">Subject Template</label>
+          <input id="cmpSubjectTpl" class="form-input" placeholder="e.g., Invitation to bid — {{project}}">
+        </div>
+        <div class="form-group">
+          <label for="cmpHtmlTpl">HTML Body</label>
+          <div class="rich-editor" data-target="cmpHtmlTpl">
+            <div class="rich-toolbar">
+              <button type="button" class="rich-btn" data-command="bold" title="Bold">B</button>
+              <button type="button" class="rich-btn" data-command="italic" title="Italic"><i>I</i></button>
+              <button type="button" class="rich-btn" data-command="underline" title="Underline"><span style="text-decoration:underline;">U</span></button>
+              <button type="button" class="rich-btn" data-command="insertUnorderedList" title="Bullet list">&bull; List</button>
+              <button type="button" class="rich-btn" data-command="insertOrderedList" title="Numbered list">1. List</button>
+              <button type="button" class="rich-btn" data-command="createLink" title="Insert link">Link</button>
+              <button type="button" class="rich-btn" data-command="unlink" title="Remove link">Unlink</button>
+            </div>
+            <div id="cmpHtmlTplEditor" class="rich-content" contenteditable="true" aria-labelledby="cmpHtmlTpl" data-placeholder="Compose your email..."></div>
+          </div>
+          <textarea id="cmpHtmlTpl" class="form-input" rows="6" placeholder="HTML body" style="display:none;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Schedule</label>
+          <div class="cmp-schedule" data-context="new">
+            <div class="cmp-schedule-modes">
+              <label class="cmp-schedule-option"><input type="radio" name="cmpScheduleModeNew" id="cmpScheduleModeNewRecurring" value="recurring" checked> Every day(s) until</label>
+              <label class="cmp-schedule-option"><input type="radio" name="cmpScheduleModeNew" id="cmpScheduleModeNewCustom" value="custom"> Select dates from calendar</label>
+            </div>
+            <div class="cmp-schedule-panel is-active" data-context="new" data-panel="recurring">
+              <div class="filter-grid cmp-schedule-recurring-grid">
+                <div class="filter-item">
+                  <label for="cmpEveryDays">Every (days)</label>
+                  <input id="cmpEveryDays" class="form-input" type="number" min="1" step="1" value="2">
+                </div>
+                <div class="filter-item">
+                  <label for="cmpUntil">Until (optional)</label>
+                  <input id="cmpUntil" class="form-input" type="date">
+                </div>
+              </div>
+            </div>
+            <div class="cmp-schedule-panel" data-context="new" data-panel="custom">
+              <div class="cmp-schedule-custom-add">
+                <input id="cmpScheduleNewCustomInput" class="form-input" type="datetime-local">
+                <button class="btn btn-secondary" id="cmpScheduleNewCustomAddBtn" type="button">Add date</button>
+              </div>
+              <div class="cmp-schedule-custom-list-wrap">
+                <p class="cmp-schedule-empty" id="cmpScheduleNewCustomEmpty">No dates selected.</p>
+                <ul class="cmp-schedule-custom-list" id="cmpScheduleNewCustomList"></ul>
+              </div>
+              <div class="form-hint">Send times use your local time zone.</div>
+            </div>
+          </div>
+        </div>
+        <div class="cmp-followups cmp-mode-new-section">
+          <div class="cmp-followup-block">
+            <label class="cmp-followup-toggle">
+              <input type="checkbox" id="cmpRfiEnableNew">
+              <span>Send RFI's Due email</span>
+            </label>
+            <div class="cmp-followup-body" id="cmpRfiBlockNew" hidden>
+              <div class="form-group">
+                <label for="cmpRfiSubjectNew">Subject</label>
+                <input id="cmpRfiSubjectNew" class="form-input" placeholder="Reminder: RFI's Due">
+              </div>
+              <div class="form-group">
+                <label for="cmpRfiHtmlNew">Email body</label>
+                <div class="rich-editor" data-target="cmpRfiHtmlNew">
+                  <div class="rich-toolbar">
+                    <button type="button" class="rich-btn" data-command="bold" title="Bold">B</button>
+                    <button type="button" class="rich-btn" data-command="italic" title="Italic"><i>I</i></button>
+                    <button type="button" class="rich-btn" data-command="underline" title="Underline"><span style="text-decoration:underline;">U</span></button>
+                    <button type="button" class="rich-btn" data-command="insertUnorderedList" title="Bullet list">&bull; List</button>
+                    <button type="button" class="rich-btn" data-command="insertOrderedList" title="Numbered list">1. List</button>
+                    <button type="button" class="rich-btn" data-command="createLink" title="Insert link">Link</button>
+                    <button type="button" class="rich-btn" data-command="unlink" title="Remove link">Unlink</button>
+                  </div>
+                  <div id="cmpRfiHtmlNewEditor" class="rich-content" contenteditable="true" aria-labelledby="cmpRfiHtmlNew" data-placeholder="Write the RFI due reminder..."></div>
+                </div>
+                <textarea id="cmpRfiHtmlNew" class="form-input" rows="4" style="display:none;"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Send on</label>
+                <div class="cmp-followup-add">
+                  <input id="cmpRfiDateNew" class="form-input" type="datetime-local">
+                  <button class="btn btn-secondary" id="cmpRfiAddDateNew" type="button">Add date</button>
+                </div>
+                <div class="cmp-schedule-custom-list-wrap">
+                  <p class="cmp-schedule-empty" id="cmpRfiEmptyNew">No dates selected.</p>
+                  <ul class="cmp-schedule-custom-list" id="cmpRfiListNew"></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cmp-followup-block">
+            <label class="cmp-followup-toggle">
+              <input type="checkbox" id="cmpBidsEnableNew">
+              <span>Send Bids Due reminder email</span>
+            </label>
+            <div class="cmp-followup-body" id="cmpBidsBlockNew" hidden>
+              <div class="form-group">
+                <label for="cmpBidsSubjectNew">Subject</label>
+                <input id="cmpBidsSubjectNew" class="form-input" placeholder="Reminder: Bids Due">
+              </div>
+              <div class="form-group">
+                <label for="cmpBidsHtmlNew">Email body</label>
+                <div class="rich-editor" data-target="cmpBidsHtmlNew">
+                  <div class="rich-toolbar">
+                    <button type="button" class="rich-btn" data-command="bold" title="Bold">B</button>
+                    <button type="button" class="rich-btn" data-command="italic" title="Italic"><i>I</i></button>
+                    <button type="button" class="rich-btn" data-command="underline" title="Underline"><span style="text-decoration:underline;">U</span></button>
+                    <button type="button" class="rich-btn" data-command="insertUnorderedList" title="Bullet list">&bull; List</button>
+                    <button type="button" class="rich-btn" data-command="insertOrderedList" title="Numbered list">1. List</button>
+                    <button type="button" class="rich-btn" data-command="createLink" title="Insert link">Link</button>
+                    <button type="button" class="rich-btn" data-command="unlink" title="Remove link">Unlink</button>
+                  </div>
+                  <div id="cmpBidsHtmlNewEditor" class="rich-content" contenteditable="true" aria-labelledby="cmpBidsHtmlNew" data-placeholder="Write the bids due reminder..."></div>
+                </div>
+                <textarea id="cmpBidsHtmlNew" class="form-input" rows="4" style="display:none;"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Send on</label>
+                <div class="cmp-followup-add">
+                  <input id="cmpBidsDateNew" class="form-input" type="datetime-local">
+                  <button class="btn btn-secondary" id="cmpBidsAddDateNew" type="button">Add date</button>
+                </div>
+                <div class="cmp-schedule-custom-list-wrap">
+                  <p class="cmp-schedule-empty" id="cmpBidsEmptyNew">No dates selected.</p>
+                  <ul class="cmp-schedule-custom-list" id="cmpBidsListNew"></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<div class="form-actions">
+          <button class="btn btn-primary" id="cmpCreateBtn">Create Campaign</button>
+        </div>
+      </div>
+
+      <div class="cmp-mode-existing">
+        <div class="form-group">
+          <label for="cmpSubjectTplEdit">Subject Template</label>
+          <input id="cmpSubjectTplEdit" class="form-input" placeholder="Subject template">
+        </div>
+        <div class="form-group">
+          <label for="cmpHtmlTplEdit">HTML Body</label>
+          <div class="rich-editor" data-target="cmpHtmlTplEdit">
+            <div class="rich-toolbar">
+              <button type="button" class="rich-btn" data-command="bold" title="Bold"><strong>B</strong></button>
+              <button type="button" class="rich-btn" data-command="italic" title="Italic"><em>I</em></button>
+              <button type="button" class="rich-btn" data-command="underline" title="Underline"><span style="text-decoration:underline;">U</span></button>
+              <button type="button" class="rich-btn" data-command="insertUnorderedList" title="Bullet list">&bull; List</button>
+              <button type="button" class="rich-btn" data-command="insertOrderedList" title="Numbered list">1. List</button>
+              <button type="button" class="rich-btn" data-command="createLink" title="Insert link">Link</button>
+              <button type="button" class="rich-btn" data-command="unlink" title="Remove link">Unlink</button>
+            </div>
+            <div id="cmpHtmlTplEditEditor" class="rich-content" contenteditable="true" aria-labelledby="cmpHtmlTplEdit" data-placeholder="Edit email content..."></div>
+          </div>
+          <textarea id="cmpHtmlTplEdit" class="form-input" rows="6" placeholder="HTML body" style="display:none;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Schedule</label>
+          <div class="cmp-schedule" data-context="edit">
+            <div class="cmp-schedule-modes">
+              <label class="cmp-schedule-option"><input type="radio" name="cmpScheduleMode" id="cmpScheduleModeRecurring" value="recurring" checked> Every day(s) until</label>
+              <label class="cmp-schedule-option"><input type="radio" name="cmpScheduleMode" id="cmpScheduleModeCustom" value="custom"> Select dates from calendar</label>
+            </div>
+            <div class="cmp-schedule-panel is-active" data-context="edit" data-panel="recurring">
+              <div class="filter-grid cmp-schedule-recurring-grid">
+                <div class="filter-item">
+                  <label for="cmpEveryDaysEdit">Every (days)</label>
+                  <input id="cmpEveryDaysEdit" class="form-input" type="number" min="1" step="1">
+                </div>
+                <div class="filter-item">
+                  <label for="cmpUntilEdit">Until (optional)</label>
+                  <input id="cmpUntilEdit" class="form-input" type="date">
+                </div>
+                <div class="filter-item">
+                  <label for="cmpNextSend">Next send</label>
+                  <input id="cmpNextSend" class="form-input" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="cmp-schedule-panel" data-context="edit" data-panel="custom">
+              <div class="cmp-schedule-custom-add">
+                <input id="cmpScheduleCustomInput" class="form-input" type="datetime-local">
+                <button class="btn btn-secondary" id="cmpScheduleCustomAddBtn" type="button">Add date</button>
+              </div>
+              <div class="cmp-schedule-custom-list-wrap">
+                <p class="cmp-schedule-empty" id="cmpScheduleCustomEmpty">No dates selected.</p>
+                <ul class="cmp-schedule-custom-list" id="cmpScheduleCustomList"></ul>
+              </div>
+              <div class="form-hint">Send times use your local time zone.</div>
+            </div>
+          </div>
+        </div>
+                <div class="cmp-followups cmp-mode-existing-section">
+          <div class="cmp-followup-block">
+            <label class="cmp-followup-toggle">
+              <input type="checkbox" id="cmpRfiEnable">
+              <span>Send RFI's Due email</span>
+            </label>
+            <div class="cmp-followup-body" id="cmpRfiBlock" hidden>
+              <div class="form-group">
+                <label for="cmpRfiSubjectEdit">Subject</label>
+                <input id="cmpRfiSubjectEdit" class="form-input" placeholder="Reminder: RFI's Due">
+              </div>
+              <div class="form-group">
+                <label for="cmpRfiHtmlEdit">Email body</label>
+                <div class="rich-editor" data-target="cmpRfiHtmlEdit">
+                  <div class="rich-toolbar">
+                    <button type="button" class="rich-btn" data-command="bold" title="Bold">B</button>
+                    <button type="button" class="rich-btn" data-command="italic" title="Italic"><i>I</i></button>
+                    <button type="button" class="rich-btn" data-command="underline" title="Underline"><span style="text-decoration:underline;">U</span></button>
+                    <button type="button" class="rich-btn" data-command="insertUnorderedList" title="Bullet list">&bull; List</button>
+                    <button type="button" class="rich-btn" data-command="insertOrderedList" title="Numbered list">1. List</button>
+                    <button type="button" class="rich-btn" data-command="createLink" title="Insert link">Link</button>
+                    <button type="button" class="rich-btn" data-command="unlink" title="Remove link">Unlink</button>
+                  </div>
+                  <div id="cmpRfiHtmlEditEditor" class="rich-content" contenteditable="true" aria-labelledby="cmpRfiHtmlEdit" data-placeholder="Write the RFI due reminder..."></div>
+                </div>
+                <textarea id="cmpRfiHtmlEdit" class="form-input" rows="4" style="display:none;"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Send on</label>
+                <div class="cmp-followup-add">
+                  <input id="cmpRfiDateEdit" class="form-input" type="datetime-local">
+                  <button class="btn btn-secondary" id="cmpRfiAddDateEdit" type="button">Add date</button>
+                </div>
+                <div class="cmp-schedule-custom-list-wrap">
+                  <p class="cmp-schedule-empty" id="cmpRfiEmptyEdit">No dates selected.</p>
+                  <ul class="cmp-schedule-custom-list" id="cmpRfiListEdit"></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cmp-followup-block">
+            <label class="cmp-followup-toggle">
+              <input type="checkbox" id="cmpBidsEnable">
+              <span>Send Bids Due reminder email</span>
+            </label>
+            <div class="cmp-followup-body" id="cmpBidsBlock" hidden>
+              <div class="form-group">
+                <label for="cmpBidsSubjectEdit">Subject</label>
+                <input id="cmpBidsSubjectEdit" class="form-input" placeholder="Reminder: Bids Due">
+              </div>
+              <div class="form-group">
+                <label for="cmpBidsHtmlEdit">Email body</label>
+                <div class="rich-editor" data-target="cmpBidsHtmlEdit">
+                  <div class="rich-toolbar">
+                    <button type="button" class="rich-btn" data-command="bold" title="Bold">B</button>
+                    <button type="button" class="rich-btn" data-command="italic" title="Italic"><i>I</i></button>
+                    <button type="button" class="rich-btn" data-command="underline" title="Underline"><span style="text-decoration:underline;">U</span></button>
+                    <button type="button" class="rich-btn" data-command="insertUnorderedList" title="Bullet list">&bull; List</button>
+                    <button type="button" class="rich-btn" data-command="insertOrderedList" title="Numbered list">1. List</button>
+                    <button type="button" class="rich-btn" data-command="createLink" title="Insert link">Link</button>
+                    <button type="button" class="rich-btn" data-command="unlink" title="Remove link">Unlink</button>
+                  </div>
+                  <div id="cmpBidsHtmlEditEditor" class="rich-content" contenteditable="true" aria-labelledby="cmpBidsHtmlEdit" data-placeholder="Write the bids due reminder..."></div>
+                </div>
+                <textarea id="cmpBidsHtmlEdit" class="form-input" rows="4" style="display:none;"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Send on</label>
+                <div class="cmp-followup-add">
+                  <input id="cmpBidsDateEdit" class="form-input" type="datetime-local">
+                  <button class="btn btn-secondary" id="cmpBidsAddDateEdit" type="button">Add date</button>
+                </div>
+                <div class="cmp-schedule-custom-list-wrap">
+                  <p class="cmp-schedule-empty" id="cmpBidsEmptyEdit">No dates selected.</p>
+                  <ul class="cmp-schedule-custom-list" id="cmpBidsListEdit"></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<div class="form-actions">
+          <button class="btn btn-primary" id="cmpSaveBtn">Save</button>
+          <button class="btn btn-secondary" id="cmpSendNowBtn">Review &amp; Send</button>
+          <button class="btn btn-secondary" id="cmpToggleBtn">Pause</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cmp-section cmp-mode-existing" id="cmpSectionTracking">
+    <div class="cmp-section-header">
+      <h3>Tracking</h3>
+    </div>
+    <div class="cmp-section-body">
+      <div id="cmpLoaded" style="display:none;">
+        <div class="form-group">
+          <div class="kpi-inline" id="cmpKpiInline">
+            <span class="kpi-label">Total Sent:</span> <span id="cmpKpiTotal" class="kpi-val">0</span>
+            <span class="kpi-sep">|</span>
+            <span class="kpi-label">Responded:</span> <span id="cmpKpiResp" class="kpi-val">0</span>
+            <span class="kpi-sep">|</span>
+            <span class="kpi-label">Pending:</span> <span id="cmpKpiPending" class="kpi-val">0</span>
+            <span class="kpi-sep">|</span>
+            <span class="kpi-label">Last Sent:</span> <span id="cmpKpiLast" class="kpi-val">—</span>
+            <span class="kpi-sep">|</span>
+            <span class="kpi-label">Next Send:</span> <span id="cmpKpiNext" class="kpi-val">—</span>
+          </div>
+          <button id="cmpHistoryToggle" class="link-btn" type="button">+ Show History</button>
+          <ul id="cmpSendHistory" class="kpi-history" hidden></ul>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Delivery Summary</label>
+        <div id="cmpRecipientSummary" class="cmp-summary-table">
+          <div class="cmp-summary-empty">No delivery activity yet.</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Responses</label>
+        <div id="cmpResponses" class="cmp-recipient-list"></div>
+      </div>
+      <div class="form-group">
+        <label>Upcoming Emails</label>
+        <div id="cmpScheduleSummary" class="cmp-schedule-summary">
+          <div class="cmp-summary-empty">No upcoming emails scheduled.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<!-- /AB Campaigns -->
+
+</section>
+
+</main>
+
+<style>
+
+    /* Additional styles for new elements */
+
+    .rich-editor {
+
+      border: 1px solid #dee2e6;
+
+      border-radius: 6px;
+
+      background: #fff;
+
+      display: flex;
+
+      flex-direction: column;
+
+      margin-top: 6px;
+
+    }
+
+
+
+    .rich-toolbar {
+
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 6px;
+
+      padding: 6px;
+
+      border-bottom: 1px solid #dee2e6;
+
+      background: #f8fafc;
+
+    }
+
+
+
+    .rich-btn {
+
+      border: 1px solid #cbd5e1;
+
+      background: #fff;
+
+      border-radius: 4px;
+
+      padding: 4px 8px;
+
+      font-size: 12px;
+
+      line-height: 1;
+
+      cursor: pointer;
+
+      color: #1f2937;
+
+    }
+
+
+
+    .rich-btn:hover {
+
+      background: #e2e8f0;
+
+    }
+
+
+
+    .rich-content {
+
+      min-height: 160px;
+
+      padding: 10px;
+
+      outline: none;
+
+      font-size: 14px;
+
+      line-height: 1.5;
+
+      border-radius: 0 0 6px 6px;
+
+    }
+
+
+
+    .rich-content:empty:before {
+
+      content: attr(data-placeholder);
+
+      color: #9ca3af;
+
+      pointer-events: none;
+
+    }
+
+    .filter-grid {
+
+      display: grid;
+
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+      gap: 12px;
+
+      margin-bottom: 16px;
+
+    }
+
+    
+
+    .filter-actions {
+
+      display: flex;
+
+      gap: 12px;
+
+      margin-top: 16px;
+
+    }
+
+    
+
+    .debug-stats {
+
+      display: grid;
+
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+
+      gap: 16px;
+
+      margin: 20px 0;
+
+    }
+
+    
+
+    .stat-card {
+
+      background: white;
+
+      padding: 16px;
+
+      border-radius: 8px;
+
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+    }
+
+    
+
+    .stat-card h4 {
+
+      margin: 0 0 8px 0;
+
+      font-size: 12px;
+
+      color: #6c757d;
+
+      text-transform: uppercase;
+
+    }
+
+    
+
+    .stat-card div {
+
+      font-size: 24px;
+
+      font-weight: bold;
+
+      color: #2c3e50;
+
+    }
+
+    
+
+    .debug-details {
+
+      background: white;
+
+      padding: 16px;
+
+      border-radius: 8px;
+
+      margin: 20px 0;
+
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+    }
+
+    
+
+    .debug-details h4 {
+
+      margin-top: 20px;
+
+      margin-bottom: 10px;
+
+      color: #495057;
+
+    }
+
+    
+
+    .debug-details h4:first-child {
+
+      margin-top: 0;
+
+    }
+
+    
+
+    .debug-actions {
+
+      display: flex;
+
+      gap: 12px;
+
+      margin-top: 20px;
+
+    }
+
+
+
+    /* Add Bidder Tab Styles */
+
+    .bid-form {
+
+      max-width: 600px;
+
+    }
+
+
+
+    .form-section {
+
+      margin-bottom: 24px;
+
+      padding-bottom: 24px;
+
+      border-bottom: 1px solid #e9ecef;
+
+    }
+
+
+
+    .form-section:last-of-type {
+
+      border-bottom: none;
+
+    }
+
+
+
+    .form-section h4 {
+
+      margin-bottom: 12px;
+
+      color: #0f4c81;
+
+      font-size: 16px;
+
+    }
+
+
+
+    .form-hint {
+
+      font-size: 12px;
+
+      color: #6c757d;
+
+      margin-bottom: 12px;
+
+    }
+
+
+
+    .divisions-container {
+
+      display: grid;
+
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+
+      gap: 8px;
+
+      max-height: 300px;
+
+      overflow-y: auto;
+
+      padding: 12px;
+
+      background: #f8f9fa;
+
+      border-radius: 6px;
+
+    }
+
+
+
+    .division-checkbox {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      padding: 8px;
+
+      background: white;
+
+      border: 1px solid #dee2e6;
+
+      border-radius: 4px;
+
+      cursor: pointer;
+
+      transition: all 0.2s;
+
+    }
+
+
+
+    .division-checkbox:hover {
+
+      background: #e8f4fd;
+
+      border-color: #0f4c81;
+
+    }
+
+
+
+    .division-checkbox input[type="checkbox"] {
+
+      width: 18px;
+
+      height: 18px;
+
+      cursor: pointer;
+
+    }
+
+
+
+    .division-checkbox span {
+
+      font-size: 13px;
+
+      font-weight: 500;
+
+    }
+
+
+
+    .divisions-container .empty-state {
+
+      grid-column: 1 / -1;
+
+      text-align: center;
+
+      color: #6c757d;
+
+      padding: 20px;
+
+    }
+
+
+
+    /* Projects Tab Styles */
+
+    .project-dropdown-item {
+
+      padding: 10px;
+
+      cursor: pointer;
+
+      border-bottom: 1px solid #eee;
+
+    }
+
+
+
+    .project-dropdown-item:hover {
+
+      background: #f5f5f5;
+
+    }
+
+
+
+    .project-dropdown-item:last-child {
+
+      border-bottom: none;
+
+    }
+
+
+
+    .division-section {
+
+      margin-bottom: 25px;
+
+    }
+
+
+
+    .division-header {
+
+      background: #f8f9fa;
+
+      padding: 10px 15px;
+
+      border-left: 4px solid #2196F3;
+
+      margin-bottom: 10px;
+
+      font-weight: bold;
+
+      color: #333;
+
+    }
+
+
+
+    .contact-row {
+
+      display: flex;
+
+      align-items: center;
+
+      padding: 10px;
+
+      border-bottom: 1px solid #eee;
+
+      transition: background 0.2s;
+
+    }
+
+
+
+    .contact-row:hover {
+
+      background: #f8f9fa;
+
+    }
+
+
+
+    .contact-checkbox {
+
+      margin-right: 12px;
+
+    }
+
+
+
+    .contact-info {
+
+      flex: 1;
+
+      display: grid;
+
+      grid-template-columns: 2fr 1.5fr 1.5fr 1fr;
+
+      gap: 15px;
+
+      font-size: 13px;
+
+    }
+
+
+
+    .contact-field {
+
+      display: flex;
+
+      flex-direction: column;
+
+    }
+
+
+
+    .contact-label {
+
+      font-size: 11px;
+
+      color: #666;
+
+      margin-bottom: 2px;
+
+    }
+
+
+
+    .contact-value {
+
+      color: #333;
+
+    }
+
+    /* Tracked Projects Dropdown Styles */
+    .tracked-project-search-container {
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    #trackedProjectSearch {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    #trackedProjectSearch:focus {
+      outline: none;
+      border-color: #0078d4;
+      box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1);
+    }
+
+    .tracked-projects-dropdown {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+      max-height: 300px;
+      overflow-y: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .tracked-projects-dropdown .tracked-selector-item {
+      padding: 8px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tracked-projects-dropdown .tracked-selector-item:last-child {
+      border-bottom: none;
+    }
+
+    .tracked-projects-dropdown .tracked-selector-item:hover {
+      background-color: #f5f5f5;
+    }
+
+    .tracked-projects-dropdown .tracked-selector-item input[type="checkbox"] {
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .tracked-projects-dropdown .tracked-label-text {
+      flex: 1;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .tracked-projects-dropdown .tracked-label-meta {
+      font-size: 12px;
+      color: #999;
+      margin-left: auto;
+    }
+
+    .tracked-projects-dropdown .dropdown-empty {
+      padding: 16px;
+      text-align: center;
+      color: #999;
+      font-size: 14px;
+    }
+
+    .tracked-projects-dropdown .dropdown-load-more {
+      width: 100%;
+      padding: 8px;
+      border: none;
+      background: #f5f5f5;
+      color: #0078d4;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      border-top: 1px solid #ddd;
+    }
+
+    .tracked-projects-dropdown .dropdown-load-more:hover {
+      background: #e8e8e8;
+    }
+
+  </style>
+
+
+
+<script src="xlsx.full.min.js"></script>
+
+
+
+
+
+
+
+<!-- Campaign Send Modal -->
+
+<div id="cmpSendModal" style="position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:9999; background:rgba(0,0,0,0.4);">
+
+  <div style="background:#fff; width:720px; max-width:95vw; max-height:85vh; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2); display:flex; flex-direction:column;">
+
+    <div style="padding:14px 16px; border-bottom:1px solid #e5e7eb; display:flex; align-items:center; justify-content:space-between;">
+
+      <div style="font-weight:600;">Review recipients for this send</div>
+
+      <button id="cmpSendModalClose" class="btn btn-secondary" style="padding:4px 10px;">Close</button>
+
+    </div>
+
+    <div style="padding:12px 16px; display:flex; gap:12px; align-items:center;">
+
+      <button id="cmpCheckAll" class="btn btn-secondary">Check all</button>
+
+      <button id="cmpUncheckAll" class="btn btn-secondary">Uncheck all</button>
+
+      <div id="cmpPendingCount" style="margin-left:auto; font-size:12px; color:#6b7280;">0 selected</div>
+
+    </div>
+
+    <div id="cmpPendingList" style="padding:0 16px 16px; overflow:auto; max-height:55vh; border-bottom:1px solid #e5e7eb;"></div>
+
+    <div style="padding:14px 16px; display:flex; align-items:center; gap:8px;">
+
+      <div id="cmpSendNotice" class="cmp-send-notice"></div>
+
+      <button id="cmpSendSelectedBtn" class="btn btn-primary">Send to selected</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Campaign Success Modal -->
+
+<div id="cmpSuccessModal" style="position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:9999; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); background:rgba(0,0,0,0.3);">
+
+  <div style="background:#fff; width:480px; max-width:90vw; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.3); display:flex; flex-direction:column; animation:slideUp 0.3s ease-out;">
+
+    <div style="padding:24px 24px 16px; text-align:center;">
+
+      <div style="width:64px; height:64px; margin:0 auto 16px; background:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+
+      </div>
+
+      <h2 style="margin:0 0 8px; font-size:24px; font-weight:600; color:#111;">Campaign Created!</h2>
+
+      <p id="cmpSuccessMessage" style="margin:0; font-size:16px; color:#6b7280;">Your campaign has been created successfully.</p>
+
+    </div>
+
+    <div style="padding:16px 24px 24px; text-align:center;">
+
+      <button id="cmpSuccessContinueBtn" class="btn btn-primary" style="padding:12px 32px; font-size:16px; width:100%;">Continue to Campaign</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<style>
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+
+
+<script src="division_mapping_helper.js"></script>
+
+<script src="data/us_cities_min.js"></script>
+
+<script src="campaigns-ui.js"></script>
+
+<script src="tracked_entries_ui.js"></script>
+
+<script src="panel.js"></script>
+
+
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+

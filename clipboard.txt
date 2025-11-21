@@ -1,0 +1,16 @@
+[ExcelSummaryUI] sending summary for sheet: (none)
+vendors~bizchat.js:1 Routing session key timeout after 30000ms
+(anonymous) @ vendors~bizchat.js:1
+setTimeout
+(anonymous) @ vendors~bizchat.js:1
+(anonymous) @ vendors~bizchat.js:1
+Ai @ vendors~15.js:2
+n.unstable_runWithPriority @ vendors~15.js:2
+ql @ vendors~15.js:2
+Di @ vendors~15.js:2
+(anonymous) @ vendors~15.js:2
+U @ vendors~15.js:2
+S.port1.onmessage @ vendors~15.js:2Understand this warning
+content.js:227 [ExcelSummaryUI] sending summary for sheet: (none)
+MicrosoftAjaxDS.js:1 [Violation] 'click' handler took 198ms
+content.js:227 [ExcelSummaryUI] sending summary for sheet: (none)

@@ -1,0 +1,2 @@
+// Add this near other importScripts at top of background.js
+try { importScripts('excel-summary-bg.js'); } catch(e) { console.warn('excel-summary not loaded', e); }
