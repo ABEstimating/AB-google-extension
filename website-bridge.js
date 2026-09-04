@@ -17,7 +17,8 @@
     'AB_GET_STATES',
     'AB_SCAN_STATE',
     'AB_GET_CACHED_DATA',
-    'AB_LOAD_PROJECT_SNAPSHOT'
+    'AB_LOAD_PROJECT_SNAPSHOT',
+    'AB_LOAD_PROJECT'
   ]);
 
   if (window.location.origin !== ALLOWED_ORIGIN) return;
@@ -33,6 +34,14 @@
       safeMessage.includeProjects = message?.includeProjects !== false;
       safeMessage.includeContacts = message?.includeContacts === true;
       safeMessage.includeZipCache = false;
+    }
+
+    if (messageType === 'AB_LOAD_PROJECT') {
+      safeMessage.cacheOnly = true;
+      safeMessage.skipRemoteValidation = true;
+      safeMessage.forceRefresh = false;
+      safeMessage.forceContactRefresh = false;
+      safeMessage.allowBackend = false;
     }
 
     return safeMessage;
