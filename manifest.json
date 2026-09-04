@@ -38,6 +38,15 @@
         "content.js"
       ],
       "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://ab-estimating.pages.dev/*"
+      ],
+      "js": [
+        "website-bridge.js"
+      ],
+      "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
