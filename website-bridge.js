@@ -1,7 +1,7 @@
 // AB Estimating website bridge
 // Limited bridge for the protected AB Estimating Cloudflare Pages site.
-// It reuses the extension's existing SharePoint/Graph project scan logic without
-// exposing general chrome.runtime messaging to arbitrary websites.
+// It reuses the extension's existing project/cache logic without exposing
+// general chrome.runtime messaging to arbitrary websites.
 
 (() => {
   'use strict';
@@ -16,7 +16,8 @@
     'AB_AUTHENTICATE',
     'AB_GET_STATES',
     'AB_SCAN_STATE',
-    'AB_GET_CACHED_DATA'
+    'AB_GET_CACHED_DATA',
+    'AB_LOAD_PROJECT_SNAPSHOT'
   ]);
 
   if (window.location.origin !== ALLOWED_ORIGIN) return;
@@ -28,8 +29,6 @@
   function buildSafeExtensionMessage(message, messageType) {
     const safeMessage = { ...(message || {}) };
 
-    // The website project list only needs the lightweight project cache.
-    // Do not send the large ZIP/location cache through the website bridge.
     if (messageType === 'AB_GET_CACHED_DATA') {
       safeMessage.includeProjects = message?.includeProjects !== false;
       safeMessage.includeContacts = message?.includeContacts === true;
