@@ -25,6 +25,20 @@
     window.postMessage(payload, ALLOWED_ORIGIN);
   }
 
+  function buildSafeExtensionMessage(message, messageType) {
+    const safeMessage = { ...(message || {}) };
+
+    // The website project list only needs the lightweight project cache.
+    // Do not send the large ZIP/location cache through the website bridge.
+    if (messageType === 'AB_GET_CACHED_DATA') {
+      safeMessage.includeProjects = message?.includeProjects !== false;
+      safeMessage.includeContacts = message?.includeContacts === true;
+      safeMessage.includeZipCache = false;
+    }
+
+    return safeMessage;
+  }
+
   window.addEventListener('message', async (event) => {
     if (event.source !== window || event.origin !== ALLOWED_ORIGIN) return;
 
@@ -47,7 +61,7 @@
     }
 
     try {
-      const response = await chrome.runtime.sendMessage(message);
+      const response = await chrome.runtime.sendMessage(buildSafeExtensionMessage(message, messageType));
       postToPage({ type: RESPONSE_TYPE, requestId, response });
     } catch (error) {
       postToPage({
