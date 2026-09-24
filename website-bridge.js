@@ -18,8 +18,7 @@
     'AB_SCAN_STATE',
     'AB_GET_CACHED_DATA',
     'AB_LOAD_PROJECT_SNAPSHOT',
-    'AB_LOAD_PROJECT',
-    'AB_ADD_BIDDER'
+    'AB_LOAD_PROJECT'
   ]);
 
   if (window.location.origin !== ALLOWED_ORIGIN) return;
@@ -43,26 +42,6 @@
       safeMessage.forceRefresh = false;
       safeMessage.forceContactRefresh = false;
       safeMessage.allowBackend = false;
-    }
-
-    if (messageType === 'AB_ADD_BIDDER') {
-      const contact = message?.contactData && typeof message.contactData === 'object' ? message.contactData : {};
-      safeMessage.projectName = String(message?.projectName || '').trim();
-      safeMessage.contactData = {
-        company:String(contact.company || '').trim(),
-        name:String(contact.name || '').trim(),
-        phone:String(contact.phone || '').trim(),
-        email:String(contact.email || '').trim(),
-        notes:String(contact.notes || '').trim()
-      };
-      safeMessage.selectedDivisions = Array.isArray(message?.selectedDivisions)
-        ? message.selectedDivisions.map((item)=>String(item || '').trim()).filter(Boolean).slice(0,100)
-        : [];
-      safeMessage.overrideConflicts = false;
-      safeMessage.forceRefresh = false;
-      if (!safeMessage.projectName || !safeMessage.contactData.email || !safeMessage.selectedDivisions.length) {
-        throw new Error('AB_ADD_BIDDER requires a project, email, and at least one workbook division.');
-      }
     }
 
     return safeMessage;
